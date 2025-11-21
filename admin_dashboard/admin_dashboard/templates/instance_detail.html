@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Instanz {{ instance.technical_name or instance.id }}</h2>
+<p>Status: {{ instance.status }} | Version: {{ instance.version }} | Umgebung: {{ instance.environment }}</p>
+<p>API: {{ instance.api_base_url }} | UI: {{ instance.base_url }}</p>
+<div class="actions">
+  <a href="{{ url_for('admin.start_instance', instance_id=instance.id) }}">Start</a>
+  <a href="{{ url_for('admin.stop_instance', instance_id=instance.id) }}">Stop</a>
+  <a href="{{ url_for('admin.restart_instance', instance_id=instance.id) }}">Restart</a>
+  <a href="{{ url_for('admin.health_check', instance_id=instance.id) }}">Healthcheck</a>
+  <a href="{{ url_for('admin.refresh_inventory', instance_id=instance.id) }}">Inventur laden</a>
+</div>
+<form method="post" action="{{ url_for('admin.update_instance', instance_id=instance.id) }}">
+  <label>Version <input name="version" value="{{ instance.version }}"></label>
+  <button type="submit">Update</button>
+</form>
+<h3>Letzte Health-Daten</h3>
+<p>Status: {{ instance.last_health_status }} | Zeitpunkt: {{ instance.last_healthcheck_at }}</p>
+<h3>Inventur-Kennzahlen</h3>
+<pre>{{ instance.last_inventory_summary | tojson(indent=2) }}</pre>
+<h3>Stammdaten-Sync</h3>
+<form method="post" action="{{ url_for('admin.sync_articles', instance_id=instance.id) }}">
+  <button type="submit">Artikel synchronisieren</button>
+</form>
+{% endblock %}

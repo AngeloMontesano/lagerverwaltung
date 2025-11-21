@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Einstellungen</h2>
+<ul>
+  <li>Mandant: {{ config.TENANT_ID }}</li>
+  <li>Umgebung: {{ config.ENVIRONMENT }}</li>
+  <li>Version: {{ config.APP_VERSION }}</li>
+</ul>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Inventurbericht</h2>
+<ul>
+  <li>Artikel: {{ report.total_articles }}</li>
+  <li>Gesamtbestand: {{ report.total_stock }}</li>
+  <li>Kritische Artikel: {{ report.critical_articles }}</li>
+</ul>
+{% endblock %}
