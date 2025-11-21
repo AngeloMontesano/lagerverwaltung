@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+  admin:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      ADMIN_DATABASE_URL: sqlite:////app/data/admin.db
+      TENANT_TEMPLATE_PATH: /workspace/lagerverwaltung/lagersoftware
+      DEFAULT_API_KEY: ${DEFAULT_API_KEY:-demo-key}
+    volumes:
+      - admin_data:/app/data
+volumes:
+  admin_data:

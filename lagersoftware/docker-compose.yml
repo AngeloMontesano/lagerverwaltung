@@ -1,0 +1,29 @@
+version: "3.9"
+services:
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: example
+      MARIADB_DATABASE: ${CUSTOMER_CODE:-demo}
+      MARIADB_USER: lager
+      MARIADB_PASSWORD: lager
+    volumes:
+      - db_data:/var/lib/mysql
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: mariadb+mariadbconnector://lager:lager@db/${CUSTOMER_CODE:-demo}
+      CUSTOMER_CODE: ${CUSTOMER_CODE:-demo}
+      API_KEY: ${API_KEY:-demo-key}
+      APP_VERSION: ${APP_VERSION:-0.1.0}
+    ports:
+      - "${APP_PORT:-5000}:5000"
+    volumes:
+      - app_data:/app/data
+volumes:
+  db_data:
+  app_data:
