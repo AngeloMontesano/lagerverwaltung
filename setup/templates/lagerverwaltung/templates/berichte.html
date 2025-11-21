@@ -1,0 +1,142 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">📊 Berichte & Analysen</h2>
+
+    <!-- =============================================
+         🔹 Zeitraum auswählen
+    ============================================= -->
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <label for="startDate"><b>Startdatum:</b></label>
+            <input type="month" id="startDate" class="form-control">
+        </div>
+        <div class="col-md-3">
+            <label for="endDate"><b>Enddatum:</b></label>
+            <input type="month" id="endDate" class="form-control">
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+            <button id="applyDateFilter" class="btn btn-primary w-100">📅 Zeitraum anwenden</button>
+        </div>
+    </div>
+
+    <!-- =============================================
+         🔹 Artikel-Auswahl mit Kategorien
+    ============================================= -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label for="kategorieDropdown"><b>Kategorie wählen:</b></label>
+            <select id="kategorieDropdown" class="form-control">
+                <option value="all">📂 Alle Kategorien</option>
+                {% for kategorie in kategorien %}
+                <option value="{{ kategorie }}">{{ kategorie }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label for="artikelDropdown"><b>Artikel hinzufügen:</b></label>
+            <select id="artikelDropdown" class="form-control">
+                {% for artikel in artikel_liste %}
+                <option data-kategorie="{{ artikel.kategorie }}" value="{{ artikel.name }}">{{ artikel.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button id="addArtikel" class="btn btn-primary w-100 mt-4">➕ Hinzufügen</button>
+        </div>
+    </div>
+
+    <!-- =============================================
+         🔹 Anzeige der gewählten Artikel
+    ============================================= -->
+    <div class="row">
+        <div class="col-md-12">
+            <div id="selectedArtikelContainer">
+                <b>Ausgewählte Artikel:</b>
+                <span id="selectedArtikelList" class="badge bg-success">Alle</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- =============================================
+         🔹 Verbrauchsanalyse
+    ============================================= -->
+    <section id="verbrauch-section" class="mt-4">
+        <h3>📊 Verbrauchsanalyse</h3>
+        <canvas id="verbrauchChart"></canvas>
+    </section>
+
+    <!-- =============================================
+         🔹 Trendanalyse
+    ============================================= -->
+    <section id="trend-section" class="mt-5">
+        <h3>📈 Trendanalyse</h3>
+        <canvas id="trendChart"></canvas>
+    </section>
+
+    <!-- =============================================
+         🔹 Export Buttons
+    ============================================= -->
+    <div class="mt-4">
+        <button class="btn btn-danger" onclick="exportPDF()">📜 Export als PDF</button>
+    </div>
+</div>
+
+<!-- =============================================
+     🔹 Lade-Overlay für PDF-Generierung
+============================================= -->
+<div id="loadingOverlay" class="overlay">
+    <div class="overlay-content">
+        <span class="spinner"></span>
+        <p>📄 PDF wird generiert... bitte warten</p>
+    </div>
+</div>
+
+<!-- =============================================
+     🔹 Styling für Overlay und Spinner
+============================================= -->
+<style>
+    .overlay {
+        display: none; /* Standardmäßig versteckt */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+    .overlay-content {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+    .spinner {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        border: 4px solid #3498db;
+        border-top: 4px solid transparent;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+<!-- =============================================
+     🔹 Externe Bibliotheken und Skripte
+============================================= -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery"></script>
+<script src="https://cdn.jsdelivr.net/npm/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="{{ url_for('static', filename='js/berichte.js') }}"></script>
+
+{% endblock %}

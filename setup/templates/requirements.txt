@@ -1,0 +1,12 @@
+Flask
+Flask-SQLAlchemy
+pymysql
+gunicorn
+python-dotenv
+pandas
+matplotlib 
+seaborn
+xlsxwriter
+reportlab  
+email-validator  
+openpyxl

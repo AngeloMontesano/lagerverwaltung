@@ -1,0 +1,139 @@
+{% extends "index.html" %}
+
+
+{% block content %}
+<div class="container">
+
+    <!-- =============================================
+         🔹 Überschrift der Artikelverwaltung
+    ============================================= -->
+    <h2 class="mb-4">📦 Artikelverwaltung</h2>
+
+    <!-- =============================================
+         🔹 Container für Benachrichtigungen
+    ============================================= -->
+    {% include "_notifications.html" %}
+
+
+    <!-- =============================================
+         🔹 Formular für neuen Artikel
+    ============================================= -->
+    <form id="add-artikel-form" class="mb-4">
+        <div class="row">
+            <!-- Artikelname -->
+            <div class="col-md-3">
+                <input type="text" id="new-name" class="form-control" placeholder="Artikelname" required>
+            </div>
+            <!-- Barcode -->
+            <div class="col-md-3">
+                <input type="text" id="new-barcode" class="form-control" placeholder="Barcode" required>
+            </div>
+            <!-- Kategorie Dropdown -->
+            <div class="col-md-3">
+                <select id="new-kategorie" class="form-control">
+                    <option value="">Kategorie wählen</option>
+                    {% for kategorie in artikel_liste | map(attribute='kategorie') | unique %}
+                        <option value="{{ kategorie }}">{{ kategorie }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <!-- Artikel hinzufügen Button -->
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">Artikel hinzufügen</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- =============================================
+         🔹 Tabelle zur Artikelverwaltung
+    ============================================= -->
+    <form id="save-all-form" method="POST" action="{{ url_for('artikel.save_all') }}">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-primary">
+                    <tr>
+                        <th class="col-1"><input type="text" id="filter-id" class="form-control form-control-sm" placeholder="ArtikelID"></th>
+                        <th class="col-2"><input type="text" id="filter-name" class="form-control form-control-sm" placeholder="Name"></th>
+                        <th class="col-2">
+                            <select id="filter-kategorie" class="form-control">
+                                <option value="">Kategorie</option>
+                                {% for kategorie in artikel_liste | map(attribute='kategorie') | unique %}
+                                    <option value="{{ kategorie }}">{{ kategorie }}</option>
+                                {% endfor %}
+                            </select>
+                        </th>
+                        <th class="col-1"><input type="number" id="filter-bestand" class="form-control form-control-sm" placeholder="IstBest."></th>
+                        <th class="col-1"><input type="number" id="filter-sollbestand" class="form-control form-control-sm" placeholder="SollBst."></th>
+                        <th class="col-1"><input type="number" id="filter-minbestand" class="form-control form-control-sm" placeholder="MinBst."></th>
+                        <th class="col-2">
+                            <select id="filter-lagerort" class="form-control">
+                                <option value="">Lagerort</option>
+                                {% for lagerort in artikel_liste | map(attribute='lagerort') | unique %}
+                                    <option value="{{ lagerort }}">{{ lagerort }}</option>
+                                {% endfor %}
+                            </select>
+                        </th>
+                        <th class="col-1"><input type="number" id="filter-preis" class="form-control form-control-sm" placeholder="Preis"></th>
+                        <th class="aktion-spalte d-none col-1">Aktionen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for artikel in artikel_liste %}
+                    <tr id="row_{{ artikel.id }}">
+                        <!-- Artikel ID -->
+                        <td>{{ artikel.pf_artikel_id }}</td>
+                        <!-- Name -->
+                        <td><input type="text" name="name_{{ artikel.id }}" value="{{ artikel.name }}" class="form-control" data-original="{{ artikel.name }}" disabled></td>
+                        <!-- Kategorie -->
+                        <td>
+                            <select name="kategorie_{{ artikel.id }}" class="form-control" data-original="{{ artikel.kategorie }}" disabled>
+                                {% for kategorie in artikel_liste | map(attribute='kategorie') | unique %}
+                                    <option value="{{ kategorie }}" {% if artikel.kategorie == kategorie %}selected{% endif %}>{{ kategorie }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <!-- Ist-Bestand -->
+                        <td><input type="number" name="bestand_{{ artikel.id }}" value="{{ artikel.bestand }}" class="form-control" data-original="{{ artikel.bestand }}" disabled></td>
+                        <!-- Soll-Bestand -->
+                        <td><input type="number" name="sollbestand_{{ artikel.id }}" value="{{ artikel.sollbestand }}" class="form-control" data-original="{{ artikel.sollbestand }}" disabled></td>
+                        <!-- Mindestbestand -->
+                        <td><input type="number" name="mindestbestand_{{ artikel.id }}" value="{{ artikel.mindestbestand }}" class="form-control" data-original="{{ artikel.mindestbestand }}" disabled></td>
+                        <!-- Lagerort -->
+                        <td>
+                            <select name="lagerort_{{ artikel.pf_artikel_id }}" class="form-control" data-original="{{ artikel.lagerort or 'n.n.' }}" disabled>
+                                {% for lagerort in artikel_liste | map(attribute='lagerort') | unique %}
+                                    <option value="{{ lagerort }}" {% if artikel.lagerort == lagerort %}selected{% endif %}>{{ lagerort }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <!-- Preis -->
+                        <td><input type="number" step="0.01" name="preis_{{ artikel.pf_artikel_id }}" value="{{ artikel.preis or '0.0' }}" class="form-control" data-original="{{ artikel.preis or '0.0' }}" disabled></td>
+                        <!-- Löschen-Button -->
+                        <td>
+                            <button type="button" class="btn btn-sm btn-danger delete-btn d-none" onclick="loeschen({{ artikel.id }})">
+                                🗑️
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- =============================================
+             🔹 Steuer-Buttons für Bearbeiten/Speichern
+        ============================================= -->
+        <div class="mt-4 text-start">
+            <button type="button" id="global-edit-btn" class="btn btn-warning">Bearbeiten</button>
+            <button type="submit" id="global-save-btn" class="btn btn-success d-none">Speichern</button>
+            <button type="button" id="global-cancel-btn" class="btn btn-secondary d-none">Abbrechen</button>
+        </div>
+    </form>
+</div>
+
+<!-- =============================================
+     🔹 JavaScript Datei einbinden
+============================================= -->
+<script src="{{ url_for('static', filename='js/artikel.js') }}"></script>
+
+{% endblock %}

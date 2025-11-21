@@ -1,0 +1,130 @@
+{% extends "index.html" %}
+
+{% block content %}
+<style>
+    .table-danger tbody tr {
+        background-color: #f8d7da80 !important; /* Transparente rote Hintergrundfarbe */
+    }
+    .table-warning tbody tr {
+        background-color: #fff3cd80 !important; /* Transparente gelbe Hintergrundfarbe */
+    }
+    .card.bg-danger {
+        background-color: rgba(220, 53, 69, 0.7) !important;
+    }
+    .card.bg-warning {
+        background-color: rgba(255, 193, 7, 0.7) !important;
+    }
+</style>
+
+<div class="container">
+    <h2 class="mb-3">📊 Dashboard</h2>
+    <p class="text-muted">Übersicht über Lagerbestand, kritische Artikel und bestellwürdige Artikel.</p>
+
+    <div class="row">
+        <!-- Gesamtartikel -->
+        <div class="col-md-4">
+            <div class="card bg-light mb-3">
+                <div class="card-body text-center">
+                    <h5 class="card-title">📦 Gesamtartikel</h5>
+                    <p class="display-6">{{ gesamt_artikel }}</p>
+                </div>
+            </div>
+        </div>
+        <!-- Kritische Artikel -->
+        <div class="col-md-4">
+            <div class="card bg-danger text-white mb-3">
+                <div class="card-body text-center">
+                    <h5 class="card-title">⚠️ Kritische Artikel</h5>
+                    <p class="display-6">{{ kritische_artikel }}</p>
+                </div>
+            </div>
+        </div>
+        <!-- Bestellwürdige Artikel -->
+        <div class="col-md-4">
+            <div class="card bg-warning text-dark mb-3">
+                <div class="card-body text-center">
+                    <h5 class="card-title">🟡 Bestellwürdige Artikel</h5>
+                    <p class="display-6">{{ bestellwuerdige_artikel }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste der kritischen Artikel -->
+    <h3 class="text-danger mt-4">⚠️ Artikel unter Mindestbestand</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover table-danger">
+            <thead class="table-dark">
+                <tr>
+                    <th>Artikelname</th>
+                    <th>Bestand</th>
+                    <th>Mindestbestand</th>
+                    <th>Bestellt</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for artikel in kritische_artikel_liste %}
+                    <tr>
+                        <td>{{ artikel.name }}</td>
+                        <td>{{ artikel.bestand }}</td>
+                        <td>{{ artikel.mindestbestand }}</td>
+                        <td>{{ artikel.bestellte_menge }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Liste der bestellwürdigen Artikel -->
+    <h3 class="text-warning mt-4">🟡 Artikel unter Sollbestand</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover table-warning">
+            <thead class="table-dark">
+                <tr>
+                    <th>Artikelname</th>
+                    <th>Bestand</th>
+                    <th>Sollbestand</th>
+                    <th>Bestellt</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for artikel in bestellwuerdige_artikel_liste %}
+                    <tr>
+                        <td>{{ artikel.name }}</td>
+                        <td>{{ artikel.bestand }}</td>
+                        <td>{{ artikel.sollbestand }}</td>
+                        <td>{{ artikel.bestellte_menge }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Aktionen -->
+    <div class="mt-4 d-flex gap-3">
+        <a href="{{ url_for('inventur.inventurseite') }}" class="btn btn-info btn-lg">📋 Inventur</a>		
+		<a href="{{ url_for('bestellungen.bestellung_uebersicht') }}" class="btn btn-primary btn-lg">🛒 Bestellung</a>
+    </div>
+</div>
+
+<!-- 🔹 Modal für Bestell-Details -->
+<div id="bestellungModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Bestellungsdetails</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Bestell-ID:</strong> <span id="bestell-id"></span></p>
+                <p><strong>Menge:</strong> <span id="bestell-menge"></span></p>
+                <p><strong>Status:</strong> <span id="bestell-status"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

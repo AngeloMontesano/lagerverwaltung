@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  1111_mariadb:
+    image: mariadb:11
+    container_name: 1111_mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: lagerdb
+      MYSQL_USER: lageruser
+      MYSQL_PASSWORD: lagerpass
+    volumes:
+      - /volume1/docker/Projekt/lagerverwaltung/1111/mariadb:/var/lib/mysql:rw
+    ports:
+      - "6005:3306"
+    healthcheck:
+      test: ["CMD", "mariadb", "-u", "root", "-prootpass", "-e", "SELECT 1;"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+
+  1111_lagerapp:
+    build:
+      context: .          # hier liegt Dockerfile + Code
+      dockerfile: Dockerfile
+    container_name: 1111_lagerapp
+    restart: always
+    depends_on:
+      - 1111_mariadb
+    environment:
+      FLASK_ENV: production
+      # SQLAlchemy-URL: user:pass@service:port/dbname
+      DATABASE_URL: "mysql+pymysql://lageruser:lagerpass@1111_mariadb:3306/lagerdb"
+    ports:
+      - "6004:5000"
+    # Wenn du Logs/Exports persistieren willst, kannst du hier noch Volumes ergänzen:
+     volumes:
+       - /volume1/docker/Projekt/lagerverwaltung/1111/logs:/app/logs

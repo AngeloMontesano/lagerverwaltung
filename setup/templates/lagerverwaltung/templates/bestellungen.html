@@ -1,0 +1,221 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>📦 Bestellungen</h2>
+    <p>Übersicht der zu bestellenden Artikel.</p>
+
+    <!-- =============================================
+         🔹 Flash-Nachricht anzeigen
+    ============================================= -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul>
+            {% for category, message in messages %}
+                <li class="alert alert-{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <!-- =============================================
+         🔹 Bestellung erstellen
+    ============================================= -->
+    <form method="POST" action="{{ url_for('bestellungen.bestellung_generieren_pdf') }}">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Artikel-ID</th>
+                    <th>Name</th>
+                    <th>Kategorie</th>
+                    <th>Ist Bestand</th>
+                    <th>Soll Bestand</th>
+                    <th>Bestellmenge</th>
+                    <th>Bereits bestellt</th>
+                    <th>Aktion</th>
+                </tr>
+            </thead>
+            <tbody id="artikel-tabelle">
+                {% for artikel in artikel_liste %}
+                <tr class="{% if artikel.bestellte_menge > 0 %}bestellte-zeile{% endif %}">
+                    <td><input type="hidden" name="artikel_id[]" value="{{ artikel.pf_artikel_id }}">{{ artikel.pf_artikel_id }}</td>
+                    <td>{{ artikel.name }}</td>
+                    <td>{{ artikel.kategorie }}</td>
+                    <td>{{ artikel.bestand }}</td>
+                    <td>{{ artikel.sollbestand }}</td>
+                    <td>
+                        <input type="number" class="form-control" name="bestellmenge[]" min="0" 
+                               value="{% if artikel.bestellte_menge > 0 %}0{% else %}{{ artikel.sollbestand - artikel.bestand if artikel.sollbestand > artikel.bestand else 0 }}{% endif %}">
+                    </td>
+                    <td>
+                        {% if artikel.bestellte_menge > 0 %}
+                            {{ artikel.bestellte_menge }} 
+                            <button type="button" class="btn btn-secondary btn-sm bestellnummer-btn" data-bestellnummer="{{ artikel.bestellnummer }}">🔍</button>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td><button type="button" class="btn btn-danger btn-sm artikel-entfernen">🗑️</button></td>
+                </tr>
+                {% endfor %}
+                <tr id="artikel-auswahl-zeile">
+                    <td colspan="8">
+                        <select id="neuer_artikel_select" class="form-control">
+                            <option value="">Artikel auswählen</option>
+                            {% for artikel in alle_artikel %}
+                            <option value="{{ artikel.pf_artikel_id }}" data-name="{{ artikel.name }}" data-kategorie="{{ artikel.kategorie }}" 
+                                data-bestand="{{ artikel.bestand }}" data-sollbestand="{{ artikel.sollbestand }}">
+                                {{ artikel.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn btn-success">📜 Bestellung generieren (PDF)</button>
+        <button type="submit" class="btn btn-info" name="send_email" value="1">📧 Bestellung senden (PDF und per E-Mail)</button>
+
+        <!-- 🔹 CC-Feld für E-Mail -->
+        <div class="form-group mt-3">
+            <label for="email-cc">📩 CC E-Mail-Adresse:</label>
+            <input type="email" class="form-control" id="email-cc" name="email_cc" placeholder="E-Mail-Adresse für CC">
+        </div>
+    </form>
+
+    <hr>
+
+    <!-- =============================================
+         🔹 Offene Bestellungen
+    ============================================= -->
+    <h3>🕒 Offene Bestellungen</h3>
+    <div class="accordion" id="offeneBestellungenAccordion">
+        {% for bestellnummer, details in gruppierte_bestellungen.items() %}
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapse{{ bestellnummer }}">
+                    <strong>{{ bestellnummer }}</strong> | {{ details.datum }} | {{ details.status }}
+                </button>
+            </h2>
+            <div id="collapse{{ bestellnummer }}" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Artikel-ID</th>
+                                <th>Name</th>
+                                <th>Menge</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for artikel in details.artikel %}
+                            <tr>
+                                <td>{{ artikel.artikel_id }}</td>
+                                <td>{{ artikel.name }}</td>
+                                <td>{{ artikel.menge }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <button class="btn btn-danger stornieren-btn" data-id="{{ details.bestellung_id }}">🚫 Bestellung stornieren</button>
+                    <button class="btn btn-primary erledigt-btn" data-id="{{ details.bestellung_id }}">✅ Als erledigt markieren</button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <hr>
+
+    <!-- =============================================
+         🔹 Erledigte Bestellungen
+    ============================================= -->
+    <h3>✔️ Erledigte Bestellungen</h3>
+    <div class="accordion" id="erledigteBestellungenAccordion">
+        {% for bestellnummer, details in erledigte_bestellungen.items() %}
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapseErledigt{{ bestellnummer }}">
+                    <strong>{{ bestellnummer }}</strong> | {{ details.datum }} | {{ details.status }}
+                </button>
+            </h2>
+            <div id="collapseErledigt{{ bestellnummer }}" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Artikel-ID</th>
+                                <th>Name</th>
+                                <th>Menge</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for artikel in details.artikel %}
+                            <tr>
+                                <td>{{ artikel.artikel_id }}</td>
+                                <td>{{ artikel.name }}</td>
+                                <td>{{ artikel.menge }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <a href="/pdf/bestellung_{{ bestellnummer }}.pdf" class="btn btn-secondary">📄 PDF herunterladen</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- =============================================
+     🔹 JavaScript für Interaktionen
+============================================= -->
+
+<script src="{{ url_for('static', filename='js/bestellungen.js') }}"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".bestellnummer-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            alert("Bestellnummer: " + this.dataset.bestellnummer);
+        });
+    });
+});
+</script>
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".bestellnummer-btn").forEach(button => {
+        button.addEventListener("mouseover", function () {
+            this.setAttribute("title", "Bestellnummer: " + this.dataset.bestellnummer);
+        });
+    });
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".scroll-to").forEach(button => {
+        button.addEventListener("click", function (event) {
+            event.preventDefault();
+            const targetId = this.getAttribute("href");
+            document.querySelector(targetId).scrollIntoView({ behavior: "smooth" });
+        });
+    });
+});
+</script>
+
+<style>
+    .bestellte-zeile {
+        background-color: rgba(144, 238, 144, 0.8); /* Transparente grüne Hintergrundfarbe */
+        border-left: 10px solid green;
+    }
+</style>
+
+{% endblock %}

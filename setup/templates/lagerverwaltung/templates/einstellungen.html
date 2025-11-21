@@ -1,0 +1,183 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>⚙️ Einstellungen</h2>
+    <p>Hier kannst du deine Firmendaten und Einstellungen ändern.</p>
+
+    <div class="accordion" id="settingsAccordion">
+
+        <!-- =============================================
+             🔹 Firmendaten
+        ============================================= -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingFirmendaten">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFirmendaten" aria-expanded="true" aria-controls="collapseFirmendaten">
+                    🏢 Firmendaten
+                </button>
+            </h2>
+            <div id="collapseFirmendaten" class="accordion-collapse collapse" aria-labelledby="headingFirmendaten" data-bs-parent="#settingsAccordion">
+                <div class="accordion-body">
+                    <form method="POST" action="{{ url_for('einstellungen.save_firmendaten') }}">
+                        <div class="mb-3">
+                            <label class="form-label">Firmenname</label>
+                            <input type="text" class="form-control" name="name" value="{{ kunde.name if kunde else '' }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Straße & Hausnummer</label>
+                            <input type="text" class="form-control" name="adresse_str" value="{{ kunde.adresse_str if kunde else '' }}">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="form-label">Postleitzahl</label>
+                                <input type="text" class="form-control" name="adresse_plz" value="{{ kunde.adresse_plz if kunde else '' }}">
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label">Ort</label>
+                                <input type="text" class="form-control" name="adresse_ort" value="{{ kunde.adresse_ort if kunde else '' }}">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">📧 E-Mail</label>
+                            <input type="email" class="form-control" name="email" value="{{ kunde.email if kunde else '' }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">📞 Telefonnummer</label>
+                            <input type="text" class="form-control" name="tel" value="{{ kunde.tel if kunde else '' }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">👤 Ansprechpartner</label>
+                            <input type="text" class="form-control" name="kontakt" value="{{ kunde.kontakt if kunde else '' }}">
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-3">Firmendaten speichern</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- =============================================
+             🔹 Automatische Bestellungen
+        ============================================= -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingAutoOrder">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAutoOrder" aria-expanded="false" aria-controls="collapseAutoOrder">
+                    📦 Automatische Bestellung / Noch nicht Implementiert 
+                </button>
+            </h2>
+            <div id="collapseAutoOrder" class="accordion-collapse collapse" aria-labelledby="headingAutoOrder" data-bs-parent="#settingsAccordion">
+                <div class="accordion-body">
+                    <form method="POST" action="{{ url_for('einstellungen.save_auto_bestellung') }}">
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" name="auto_bestellung" {% if auto_bestellung == "1" %}checked{% endif %}>
+                            <label class="form-check-label">Automatische Bestellung aktivieren</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-3">Automatische Bestellung speichern</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- =============================================
+             🔹 Benutzer & Berechtigungen
+        ============================================= -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingBenutzer">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBenutzer" aria-expanded="false" aria-controls="collapseBenutzer">
+                    👥 Benutzer & Berechtigungen / Noch nicht Implementiert 
+                </button>
+            </h2>
+            <div id="collapseBenutzer" class="accordion-collapse collapse" aria-labelledby="headingBenutzer" data-bs-parent="#settingsAccordion">
+                <div class="accordion-body">
+                    <form method="POST" action="{{ url_for('einstellungen.save_benutzer') }}">
+                        <button class="btn btn-primary">Benutzer hinzufügen</button>
+                        <button type="submit" class="btn btn-primary mt-3">Benutzer speichern</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- =============================================
+             🔹 System & Export-Einstellungen
+        ============================================= -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingSystem">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSystem" aria-expanded="false" aria-controls="collapseSystem">
+                    📩️ Bestell-Empfänger
+                </button>
+            </h2>
+            <div id="collapseSystem" class="accordion-collapse collapse" aria-labelledby="headingSystem" data-bs-parent="#settingsAccordion">
+                <div class="accordion-body">
+                    <form method="POST" action="{{ url_for('einstellungen.email_empfaenger') }}">
+                        <label class="form-label">📩 Bestell-Empfänger E-Mail:</label>
+                        <input type="email" class="form-control" name="email_empfaenger" value="{{ email_empfaenger }}">
+<!--                     <label class="form-label mt-3">📂 Standard-Exportformat:</label>
+                        <select class="form-control" name="export_format">
+                            <option value="csv" {% if export_format == "csv" %}selected{% endif %}>CSV</option>
+                            <option value="excel" {% if export_format == "excel" %}selected{% endif %}>Excel</option>
+                            <option value="pdf" {% if export_format == "pdf" %}selected{% endif %}>PDF</option>
+                        </select> -->
+                        <button type="submit" class="btn btn-primary mt-3">System-Einstellungen speichern</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+		<!-- =============================================
+			 🔹 Mass Export & Mass Änderungen
+		============================================= -->
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="headingMassExportImport">
+				<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMassExportImport" aria-expanded="false" aria-controls="collapseMassExportImport">
+					🔄 Mass Export & Änderungen
+				</button>
+			</h2>
+			<div id="collapseMassExportImport" class="accordion-collapse collapse" aria-labelledby="headingMassExportImport" data-bs-parent="#settingsAccordion">
+				<div class="accordion-body">
+					<!-- Mass Export (Exportiert alle Artikel als Excel) -->
+					<form method="POST" action="{{ url_for('einstellungen.mass_export') }}">
+						<button type="submit" class="btn btn-info mt-3">Massen Export (Excel)</button>
+					</form>
+
+					<!-- Import Template (Importvorlage herunterladen) -->
+					<form method="GET" action="{{ url_for('einstellungen.import_template') }}">
+						<button type="submit" class="btn btn-secondary mt-3">📥 Import-Template herunterladen</button>
+					</form>
+
+					<hr>
+
+					<!-- Mass Änderungen (Excel-Datei hochladen) -->
+					<form method="POST" action="{{ url_for('einstellungen.mass_import') }}" enctype="multipart/form-data">
+						<label class="form-label">📂 Excel-Datei für Mass Änderungen:</label>
+						<input type="file" class="form-control" name="file" accept=".xlsx">
+						<button type="submit" class="btn btn-success mt-3">Massen Änderungen durchführen</button>
+					</form>
+				</div>
+			</div>
+		</div>
+
+
+        <!-- =============================================
+             🔹 Test-E-Mail senden
+        ============================================= -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingEmailTest">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEmailTest" aria-expanded="false" aria-controls="collapseEmailTest">
+                    ✉️ Test-E-Mail senden
+                </button>
+            </h2>
+            <div id="collapseEmailTest" class="accordion-collapse collapse" aria-labelledby="headingEmailTest" data-bs-parent="#settingsAccordion">
+                <div class="accordion-body">
+                    <form method="POST" action="{{ url_for('einstellungen.send_test_email') }}">
+                        <div class="mb-3">
+                            <label for="test_email_empfaenger" class="form-label">📩 Test-E-Mail Empfänger:</label>
+                            <input type="email" class="form-control" id="test_email_empfaenger" name="test_email_empfaenger" value="{{ email_empfaenger }}" placeholder="E-Mail-Adresse eingeben">
+                        </div>
+                        <button type="submit" class="btn btn-warning">Test-E-Mail senden</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

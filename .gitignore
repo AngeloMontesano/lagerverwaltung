@@ -1,0 +1,11 @@
+# Synology Metadaten
+@eaDir/
+
+# Python Cache
+__pycache__/
+*.pyc
+
+# Venv
+venv/
+ENV/
+.env

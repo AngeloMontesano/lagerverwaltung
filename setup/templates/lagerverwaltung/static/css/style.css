@@ -1,0 +1,387 @@
+/* 🌍 Allgemeine Stile */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+}
+
+/* 🔹 Navigation auf mehrere Zeilen umbrechen, falls kein Platz mehr ist */
+.navbar-nav {
+    display: flex;
+    flex-wrap: wrap; /* Erlaubt Umbruch auf mehrere Zeilen */
+    justify-content: center; /* Zentriert die Elemente */
+    gap: 10px; /* Abstand zwischen Menüpunkten */
+}
+
+/* 🔹 Sicherstellen, dass die Navbar auch bei kleiner Breite nicht abgeschnitten wird */
+.navbar-collapse {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+
+/* 🔹 Fix: Entfernt weißen Hintergrund aus der Navbar */
+.navbar .container {
+    background: none !important;
+}
+
+/* 🔹 Schriftfarbe für alle Navigation-Links */
+.navbar-nav .nav-link {
+    font-size: 1rem;
+    padding: 8px 15px;
+    color: white !important; /* 🔥 Fix für unsichtbare Schrift */
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: background 0.3s, color 0.3s;
+}
+
+/* 🔹 Hover-Effekt für Navigation */
+.navbar-nav .nav-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #f8f9fa !important;
+}
+
+/* 🔹 Logo-Titel (Pfersich Flow) */
+.navbar-brand {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: white !important;
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+/* 🔹 Navbar: Weniger Platz nach unten */
+.navbar {
+    margin-bottom: 10px;
+}
+
+/* 🔹 Body: Entfernt unnötigen Leerraum */
+body {
+    padding-top: 0;
+    margin-top: 0;
+}
+
+.navbar-brand img {
+    height: 75px; /* Erhöhe die Höhe des Logos */
+    width: auto;  /* Automatische Breite, um das Seitenverhältnis zu erhalten */
+}
+
+
+/* 🔹 Hauptcontainer (Dashboard, Bestand, etc.) */
+.container {
+    max-width: 1100px;
+    margin: 10px auto 20px auto; /* Abstand zur Navbar */
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 🔹 Buttons für Aktionen */
+.btn {
+    padding: 12px 18px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* 🔹 Footer */
+footer {
+    background-color: #007bff;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+/* 🔹 Responsives Design für mobile Geräte */
+@media (max-width: 768px) {
+    .container {
+        width: 90%;
+    }
+
+    .navbar-brand {
+        font-size: 1rem;
+    }
+
+    .list-group-item {
+        font-size: 1rem;
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .navbar-nav {
+        text-align: center;
+    }
+
+    .navbar-nav .nav-link {
+        display: block;
+        padding: 10px;
+    }
+}
+
+/* 🔹 Artikelverwaltung: Tabelle optimieren */
+.table-responsive {
+    margin-top: 20px;
+}
+
+.table {
+    border-collapse: collapse;
+    width: 100%;
+    background-color: white;
+}
+
+.table th {
+    background-color: #007bff;
+    color: white;
+    text-align: center;
+    padding: 10px;
+}
+
+.table td {
+    text-align: center;
+    padding: 8px;
+}
+
+/* 🔹 Buttons für Artikelaktionen */
+.btn-sm {
+    font-size: 0.8rem;
+    padding: 5px 10px;
+}
+
+
+/* Inventur */
+
+.table-responsive {
+    margin-top: 20px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.table th {
+    background-color: #007bff;
+    color: white;
+    text-align: center;
+}
+
+.table td {
+    text-align: center;
+}
+
+.speichern-button {
+    width: 100%;
+}
+
+.neuer-bestand {
+    text-align: center;
+    width: 80px;
+}
+
+
+.navbar-brand img {
+    height: 60px; /* Höhe des Logos */
+    width: auto;  /* Automatische Breite, um Verzerrung zu vermeiden */
+}
+
+.notification {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 12px 16px;
+    color: white;
+    font-weight: bold;
+    border-radius: 4px;
+    z-index: 9999;
+}
+
+.notification.success { background-color: #28a745; }
+.notification.error { background-color: #dc3545; }
+.notification.info { background-color: #007bff; }
+
+.fade-out {
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
+}
+
+
+/* Bestellung */
+
+.bestellte-zeile2 > td {
+    background-color: rgba(173, 255, 173, 0.1) !important; /* Helleres Grün mit mehr Transparenz */
+}
+
+.bestellte-zeile > td {
+    background-color: #dbfada !important; /* Helles Grün, ähnlich dem Blau von Offene Bestellungen */
+}
+
+}
+.bestellte-zeile {
+    border-left: 5px solid green !important; /* Grüner Rand links */
+}
+
+.bestellnummer-btn {
+    padding: 4px 6px; /* Kleinere Knopfgröße */
+    margin-left: 20px; /* Mehr Abstand zur Bestellmenge */
+}
+
+
+
+/* Inventur */
+
+fetch("/inventur/save_all", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ updates })
+})
+.then(response => {
+    if (!response.ok) {
+        throw new Error(`Server-Fehler ${response.status}: ${response.statusText}`);
+    }
+    return response.json();
+})
+.then(data => {
+    alert(data.message);
+    updates.forEach(update => {
+        let inputFeld = document.querySelector(`input[data-id='${update.id}']`);
+        inputFeld.setAttribute("data-original", update.bestand);
+    });
+})
+.catch(error => {
+    console.error("❌ Fehler beim Speichern:", error);
+    alert(`Fehler beim Speichern! ${error.message}`);
+});
+
+/* 🔹 Zentrale Notification-Styles */
+.notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 300px;
+    z-index: 1050;
+}
+
+.notification {
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.notification.success { background-color: #28a745; }
+.notification.error { background-color: #dc3545; }
+.notification.warning { background-color: #ffc107; }
+.notification.info { background-color: #17a2b8; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
+
+
+
+/* 🔹 SweetAlert2 - Zentrales Styling */
+.swal2-popup {
+    font-family: Arial, sans-serif;  /* Einheitliche Schriftart */
+    border-radius: 10px;  /* Abgerundete Ecken */
+    padding: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* 🔹 Überschrift-Styling */
+.swal2-title {
+    font-size: 22px;
+    color: #333;
+    font-weight: bold;
+}
+
+/* 🔹 Text-Styling */
+.swal2-content {
+    font-size: 16px;
+    color: #555;
+}
+
+/* 🔹 Buttons anpassen */
+.swal2-confirm {
+    background-color: #dc3545 !important; /* Rotes Delete-Button */
+    border-radius: 5px;
+    padding: 10px 20px;
+}
+
+.swal2-cancel {
+    background-color: #6c757d !important; /* Grauer Cancel-Button */
+    border-radius: 5px;
+    padding: 10px 20px;
+}
+
+/* 🔹 Erfolgsmeldung */
+.swal2-icon.swal2-success {
+    border-color: #28a745 !important;
+    color: #28a745 !important;
+}
+
+/* 🔹 Warnung */
+.swal2-icon.swal2-warning {
+    border-color: #ffc107 !important;
+    color: #ffc107 !important;
+}
+
+/* 🔹 Fehler */
+.swal2-icon.swal2-error {
+    border-color: #dc3545 !important;
+    color: #dc3545 !important;
+}
+
+/* 🔹 Größe des Popups */
+.swal2-popup {
+    width: 400px; /* Kann angepasst werden */
+}
+
+
+/* 🔹 Modal für Bestellungen */
+.modal-content {
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    background-color: #007bff;
+    color: white;
+    border-bottom: none;
+}
+
+.modal-footer {
+    border-top: none;
+}
+
+
+/* 🔹 Rote Fehlermeldung für "Bestand reduziert" */
+.notification.error {
+    background-color: #dc3545 !important; /* Bootstrap Rot */
+    color: white;
+}

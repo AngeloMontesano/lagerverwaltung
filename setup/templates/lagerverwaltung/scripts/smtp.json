@@ -1,0 +1,6 @@
+{
+    "SMTP_SERVER": "mail.myitnetwork.de",
+    "SMTP_PORT": 465,
+    "EMAIL_ABSENDER": "lagerverwaltung@myitnetwork.de",
+    "EMAIL_PASSWORT": "m5odZeN)WA38d-?oS["
+}

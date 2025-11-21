@@ -1,0 +1,153 @@
+{% extends "index.html" %}
+
+{% block content %}
+{% include "_notifications.html" %}
+
+<div class="container">
+    <h2 class="mb-4">📋 Inventurverwaltung</h2>
+
+    <!-- =============================================
+         🔹 Suchfeld für Artikel & Zentrales Speichern
+    ============================================= -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <input type="text" id="artikelSuche" class="form-control" placeholder="🔍 Artikel suchen...">
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-primary w-100" onclick="exportCSV()">📄 Inventurliste generieren</button>
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-success w-100" id="speichern-alle">💾 Alle speichern</button>
+        </div>
+    </div>
+
+    <!-- =============================================
+         🔹 Tabelle für Inventur
+    ============================================= -->
+    <div class="table-responsive">
+		 <table class="table table-striped table-hover" id="inventurTabelle">
+			<thead class="table-primary">
+				<tr>
+					<th>Artikel-ID</th>
+					<th>Name</th>
+					<th>Barcode</th>
+					<th>Kategorie</th>
+					<th>Bestand</th>
+					<th>Soll</th>
+					<th>Min</th>
+<!--					<th>MHD</th>  -->
+					<th>Neuer Bestand</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for artikel in artikel_liste %}
+				<tr>
+					<td>{{ artikel.pf_artikel_id }}</td>
+					<td>{{ artikel.name }}</td>
+					<td>{{ artikel.ean }}</td>
+					<td>{{ artikel.kategorie }}</td>
+					<td>{{ artikel.bestand }}</td>
+					<td>{{ artikel.sollbestand }}</td>
+					<td>{{ artikel.mindestbestand }}</td>
+<!--					<td>{{ artikel.mhd_datum or '-' }}</td> -->
+					<td><input type="number" class="form-control neuer-bestand" data-id="{{ artikel.id }}" value="{{ artikel.bestand }}" data-original="{{ artikel.bestand }}"></td>
+				</tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- =============================================
+     🔹 JavaScript für Live-Suche & Zentrales Speichern
+============================================= -->
+<script>
+document.getElementById("artikelSuche").addEventListener("keyup", function() {
+    let filter = this.value.toLowerCase();
+    let rows = document.querySelectorAll("#inventurTabelle tbody tr");
+
+    rows.forEach(row => {
+        let name = row.cells[1].innerText.toLowerCase();
+        row.style.display = name.includes(filter) ? "" : "none";
+    });
+});
+
+document.getElementById("speichern-alle").addEventListener("click", function() {
+    let updates = [];
+    document.querySelectorAll("#inventurTabelle tbody tr").forEach(row => {
+        let artikelId = row.cells[0].innerText;
+        let inputFeld = row.querySelector(".neuer-bestand");
+        let neuerBestand = inputFeld.value;
+        let originalBestand = inputFeld.getAttribute("data-original");
+
+        if (neuerBestand !== originalBestand) {
+            updates.push({ id: artikelId, bestand: neuerBestand });
+        }
+    });
+
+	if (updates.length === 0) {
+		showNotification("✅ Keine Änderungen zu speichern!", "info");
+		return;
+	}
+
+    fetch("/inventur/save_all", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ updates })
+    })
+    .then(response => response.json())
+    .then(data => {
+        showNotification(data.message, "success");
+		updates.forEach(update => {
+			let artikelId = String(update.id);  // Sicherstellen, dass es ein String ist
+			let inputFeld = document.querySelector(`input[data-id='${artikelId}']`);
+
+			if (!inputFeld) {
+				console.warn(`⚠️ Kein Input-Feld für Artikel-ID ${artikelId} gefunden. Artikel evtl. aus der Tabelle entfernt.`);
+				return;  // Fehler wird abgefangen, Skript bricht nicht ab
+			}
+
+			console.log(`✅ Setze data-original für Artikel ${artikelId} → ${update.bestand}`);
+			inputFeld.setAttribute("data-original", update.bestand);
+		});
+    })
+    .catch(error => console.error("❌ Fehler beim Speichern:", error));
+});
+
+// Funktion exportCSV schließen
+function exportCSV() {
+    window.location.href = "/inventur/export";
+}
+</script>  <!-- Hier wird das Skript korrekt geschlossen -->
+
+
+<!-- 🔹 Modal für Artikel-Details -->
+<div id="artikelModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Artikel-Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Artikel-ID:</strong> <span id="artikel-id"></span></p>
+                <p><strong>Name:</strong> <span id="artikel-name"></span></p>
+                <p><strong>Barcode:</strong> <span id="artikel-barcode"></span></p>
+                <p><strong>Kategorie:</strong> <span id="artikel-kategorie"></span></p>
+                <p><strong>Bestand:</strong> <span id="artikel-bestand"></span></p>
+                <p><strong>Mindestbestand:</strong> <span id="artikel-min"></span></p>
+                <p><strong>Sollbestand:</strong> <span id="artikel-soll"></span></p>
+ <!--               <p><strong>MHD:</strong> <span id="artikel-mhd"></span></p> -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript-Dateien laden -->
+<script src="{{ url_for('static', filename='js/global.js') }}"></script>
+<script src="{{ url_for('static', filename='js/inventur.js') }}"></script>
+
+{% endblock %}
