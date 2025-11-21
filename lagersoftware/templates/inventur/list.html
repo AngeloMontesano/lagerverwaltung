@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<h4>Inventur</h4>
+<form method="post" action="{{ url_for('inventur.zaehlung') }}" class="row g-3 mb-4">
+  <div class="col-md-4">
+    <label class="form-label">Artikel</label>
+    <select class="form-select" name="article_id">
+      {% for article in articles %}
+      <option value="{{ article.id }}">{{ article.sku }} – {{ article.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Gezählte Menge</label>
+    <input class="form-control" type="number" name="quantity" required>
+  </div>
+  <div class="col-md-2 align-self-end">
+    <button class="btn btn-primary" type="submit">Speichern</button>
+  </div>
+</form>
+<h5>Historie</h5>
+<table class="table table-striped">
+  <thead><tr><th>Artikel</th><th>Menge</th><th>Datum</th></tr></thead>
+  <tbody>
+    {% for count in counts %}
+    <tr>
+      <td>{{ count.article.sku }} – {{ count.article.name }}</td>
+      <td>{{ count.counted_quantity }}</td>
+      <td>{{ count.counted_at.strftime('%d.%m.%Y %H:%M') }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="3">Noch keine Inventuren erfasst.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

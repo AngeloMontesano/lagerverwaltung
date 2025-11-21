@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4>Artikel</h4>
+  <a class="btn btn-primary" href="{{ url_for('artikel.erstellen') }}">Neu</a>
+</div>
+<table class="table table-hover">
+  <thead><tr><th>SKU</th><th>Name</th><th>Menge</th></tr></thead>
+  <tbody>
+    {% for article in articles %}
+    <tr>
+      <td>{{ article.sku }}</td>
+      <td>{{ article.name }}</td>
+      <td>{{ article.quantity }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="3">Keine Artikel vorhanden.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

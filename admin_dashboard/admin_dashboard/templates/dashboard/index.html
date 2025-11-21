@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <h3>Mandanten</h3>
+  <a class="btn btn-primary" href="{{ url_for('admin.create_tenant') }}">Neuer Mandant</a>
+</div>
+<table class="table table-striped">
+  <thead><tr><th>Name</th><th>Code</th><th>Status</th><th>Endpoint</th><th>API</th><th>Aktionen</th></tr></thead>
+  <tbody>
+    {% for tenant in tenants %}
+    <tr>
+      <td>{{ tenant.name }}</td>
+      <td>{{ tenant.code }}</td>
+      <td>{{ tenant.status }}</td>
+      <td>{{ tenant.endpoint_url }}</td>
+      <td>{{ stats.get(tenant.code, {}).get('status', 'unbekannt') }}</td>
+      <td>
+        <form method="post" action="{{ url_for('admin.deploy', code=tenant.code) }}" class="d-inline">
+          <button class="btn btn-sm btn-success">Deploy/Start</button>
+        </form>
+        <form method="post" action="{{ url_for('admin.stop', code=tenant.code) }}" class="d-inline">
+          <button class="btn btn-sm btn-secondary">Stop</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6">Noch keine Mandanten angelegt.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
