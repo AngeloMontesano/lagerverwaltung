@@ -51,10 +51,10 @@ if [[ "$DELETE_NETWORKS" == "y" ]]; then
 fi
 
 # Nachfragen, ob FS gelöscht werden soll
-read -p "❓ Möchtest du FileSystem Ordner löschen (y/n): " DELETE_Filesystem
+read -p "❓ Möchtest du Filesystem-Ordner löschen (y/n): " DELETE_Filesystem
 if [[ "$DELETE_Filesystem" == "y" ]]; then
-    echo "🌐 Lösche alte Ornder auf FileSystem..."
-    rm -r /volume1/docker/lagerverwaltung/$CONTAINER_PATTERN
+    echo "🌐 Lösche alte Ordner auf dem Filesystem..."
+    rm -r "/volume1/docker/lagerverwaltung/$CONTAINER_PATTERN"
 fi
 
 
