@@ -1,7 +1,7 @@
 # Architektur des Admin-Dashboards
 
 ## Überblick
-Das Dashboard ist eine separate Flask-Anwendung, die ausschließlich zur Verwaltung der mandantenfähigen Lagerverwaltungsinstanzen dient. Die eigentliche Lager-App läuft pro Kunde als eigene Instanz und bleibt unberührt.
+Das Dashboard ist eine separate Flask-Anwendung im Package `admin_dashboard`. Die eigentliche Lager-App läuft pro Kunde als eigene Instanz und bleibt unberührt. Durch das Application-Factory-Pattern lässt sich die App sauber über Gunicorn (`admin_dashboard.app:create_app()`) laden.
 
 Das System ist in Schichten gegliedert, sodass spätere Erweiterungen (Artikelreplikation, Monitoring, Backups, Lizenzverwaltung) ohne Bruch integrierbar sind.
 
@@ -13,12 +13,21 @@ Das System ist in Schichten gegliedert, sodass spätere Erweiterungen (Artikelre
   - Mandanten-DBs (per `db_url`), nur lesend für KPIs.
 
 ## Hauptmodule
-- `app.py`: Application Factory, Blueprint-Registrierung, Migrations-Setup.
-- `config.py`: Zentrale Konfiguration (DB-URI, Secret Key, Docker-Endpoint-Platzhalter).
-- `models.py`: Datenmodell mit `Customer` und `Instance` inklusive Zeitstempel und Status.
-- `routes/admin.py`: UI-Logik, Tabellenübersicht, Detailseite, Steuerungsaktionen.
-- `docker_client.py`: Stub-Client für Lifecycle-Aktionen. Kommentare markieren die Stellen, an denen später Docker/Portainer/Kubernetes angebunden wird.
-- `tenant_db.py`: Lesender Zugriff auf Mandanten-DBs. Nutzt das bestehende Schema (`artikel`-Tabelle) für KPIs (Anzahl Artikel, Summe Bestand, kritische Artikel).
+- `admin_dashboard/app.py`: Application Factory, Blueprint-Registrierung, Migrations-Setup.
+- `admin_dashboard/config.py`: Zentrale Konfiguration (DB-URI, Secret Key, Docker-Endpoint-Platzhalter).
+- `admin_dashboard/models.py`: Datenmodell mit `Customer` und `Instance` inklusive Zeitstempel und Status.
+- `admin_dashboard/routes/admin.py`: UI-Logik, Tabellenübersicht, Detailseite, Steuerungsaktionen.
+- `admin_dashboard/docker_client.py`: Stub-Client für Lifecycle-Aktionen. Kommentare markieren die Stellen, an denen später Docker/Portainer/Kubernetes angebunden wird.
+- `admin_dashboard/tenant_db.py`: Lesender Zugriff auf Mandanten-DBs. Nutzt das bestehende Schema (`artikel`-Tabelle) für KPIs (Anzahl Artikel, Summe Bestand, kritische Artikel).
+
+## Ablauf (textuelles Diagramm)
+```
+Gunicorn → lädt admin_dashboard.app:create_app
+          → lädt Config, initialisiert SQLAlchemy + Migrationen
+          → registriert Blueprint admin
+          → Routen nutzen docker_client + tenant_db
+          → Admin-Dashboard läuft
+```
 
 ## Wichtige Flows
 1. **Übersicht laden**
@@ -36,9 +45,3 @@ Das System ist in Schichten gegliedert, sodass spätere Erweiterungen (Artikelre
 - **Monitoring & Alerts**: Healthchecks und Error-Logs können als zusätzliche Hintergrundjobs oder Blueprints ergänzt werden, ohne die Webschicht zu ändern.
 - **Backups/Restore**: Weitere Infrastrukturmodule können an `DockerClient` oder neue Klassen angedockt werden.
 - **Tarif-/Lizenzverwaltung**: Zusätzliche Felder/Modelle lassen sich via Migrationen ergänzen, ohne die Trennung der Mandanten-Ebenen aufzuheben.
-
-## Datenbankschema der Mandanten
-Basierend auf `setup/templates/schema.sql` wird die Tabelle `artikel` genutzt, um die KPIs zu ermitteln:
-- `bestand`: aktueller Lagerbestand
-- `mindestbestand`: Schwelle für kritische Bestände (`bestand < mindestbestand`)
-- Weitere Tabellen (z. B. `kunde`, `lagerbewegungen`, `bestellungen`) bleiben unverändert und können später für zusätzliche KPIs genutzt werden.

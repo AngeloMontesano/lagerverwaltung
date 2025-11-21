@@ -19,24 +19,32 @@ class DockerClient:
     """
 
     def start_instance(self, instance: Instance) -> None:
+        """Mark the instance as running and persist the change."""
+
         # TODO: call Docker/Portainer/Kubernetes API to start the stack/container.
         instance.status = "running"
         instance.last_deploy_at = datetime.utcnow()
         db.session.commit()
 
     def stop_instance(self, instance: Instance) -> None:
+        """Mark the instance as stopped and persist the change."""
+
         # TODO: call orchestrator API to stop the stack/container.
         instance.status = "stopped"
         instance.last_deploy_at = datetime.utcnow()
         db.session.commit()
 
     def restart_instance(self, instance: Instance) -> None:
+        """Mark the instance as restarted and persist the change."""
+
         # TODO: call orchestrator API to restart the stack/container.
         instance.status = "running"
         instance.last_deploy_at = datetime.utcnow()
         db.session.commit()
 
     def update_instance(self, instance: Instance, new_version: str) -> None:
+        """Persist a version update and mark the instance as updating."""
+
         # TODO: pull new image version and redeploy via orchestrator API.
         instance.version = new_version
         instance.status = "updating"

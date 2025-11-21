@@ -9,17 +9,22 @@ from ..tenant_db import check_connection, get_basic_inventory_stats
 
 admin_bp = Blueprint("admin", __name__)
 
+
 docker_client = DockerClient()
 
 
 @admin_bp.route("/")
 def dashboard():
+    """Render an overview of customers and their instances."""
+
     customers = Customer.query.order_by(Customer.name).all()
     return render_template("dashboard.html", customers=customers)
 
 
 @admin_bp.route("/instance/<int:instance_id>", methods=["GET", "POST"])
 def instance_detail(instance_id: int):
+    """Display details and allow lifecycle actions for a single instance."""
+
     instance = Instance.query.get_or_404(instance_id)
 
     if request.method == "POST":
