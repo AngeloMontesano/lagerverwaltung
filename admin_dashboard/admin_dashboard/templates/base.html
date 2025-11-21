@@ -2,25 +2,25 @@
 <html lang="de">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-      <div class="container">
-        <a class="navbar-brand" href="{{ url_for('admin.index') }}">Admin Dashboard</a>
-        <div>
-          <a class="nav-link d-inline text-white" href="{{ url_for('admin.create_tenant') }}">Mandant anlegen</a>
-        </div>
-      </div>
-    </nav>
-    <main class="container">
+    <header>
+      <h1>Admin Dashboard</h1>
+      <nav>
+        <a href="{{ url_for('admin.dashboard') }}">Übersicht</a>
+        <a href="{{ url_for('admin.master_articles') }}">Stammdaten</a>
+      </nav>
+    </header>
+    <main>
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
+          <ul class="flash">
           {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
+            <li class="{{ category }}">{{ message }}</li>
           {% endfor %}
+          </ul>
         {% endif %}
       {% endwith %}
       {% block content %}{% endblock %}

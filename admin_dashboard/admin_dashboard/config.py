@@ -1,16 +1,18 @@
-"""Konfiguration für das Admin-Dashboard."""
+"""Configuration for Admin Dashboard."""
+from __future__ import annotations
+
 import os
 from dataclasses import dataclass
 
 
 @dataclass
 class Config:
-    SECRET_KEY: str = os.getenv("SECRET_KEY", "admin-secret")
-    SQLALCHEMY_DATABASE_URI: str = os.getenv(
-        "ADMIN_DATABASE_URL", f"sqlite:///{os.path.abspath('data/admin.db')}"
-    )
+    DATABASE_URI: str = os.environ.get("DASHBOARD_DATABASE_URI", "sqlite:///data/dashboard.db")
+    SECRET_KEY: str = os.environ.get("DASHBOARD_SECRET_KEY", "change-me")
+    SQLALCHEMY_DATABASE_URI: str = DATABASE_URI
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
-    PORTAINER_URL: str | None = os.getenv("PORTAINER_URL")
-    PORTAINER_TOKEN: str | None = os.getenv("PORTAINER_TOKEN")
-    TENANT_TEMPLATE_PATH: str = os.getenv("TENANT_TEMPLATE_PATH", "../lagersoftware")
-    DEFAULT_API_KEY: str = os.getenv("DEFAULT_API_KEY", "demo-key")
+    INSTANCE_API_TIMEOUT: int = int(os.environ.get("INSTANCE_API_TIMEOUT", "5"))
+
+
+class TestConfig(Config):
+    DATABASE_URI: str = "sqlite:///:memory:"

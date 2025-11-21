@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Artikel</h2>
+<a href="{{ url_for('artikel.create_view') }}">Neuen Artikel anlegen</a>
+<table>
+  <tr><th>Artikelnummer</th><th>Name</th><th>Bestand</th><th>Kritisch ab</th></tr>
+  {% for article in articles %}
+    <tr>
+      <td>{{ article.artikelnummer }}</td>
+      <td>{{ article.name }}</td>
+      <td>{{ article.stock }}</td>
+      <td>{{ article.critical_stock }}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="4">Keine Artikel vorhanden</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

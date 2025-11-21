@@ -1,29 +1,41 @@
 # Admin Dashboard
 
-Das Admin-Dashboard dient als Control Plane für die mehrmandantenfähige Lagersoftware. Es verwaltet Mandantenmetadaten, löst Deployments aus und fragt Gesundheitsinformationen der Instanzen ab.
-
-## Lokaler Start
-
-```bash
-cd admin_dashboard
-docker compose up -d --build
-```
-
-Standardmäßig nutzt die App eine SQLite-Datenbank im Volume `admin_data`. Beim Start legt `create_app()` alle Tabellen automatisch an (Tabellenname `customers` bleibt aus Abwärtskompatibilität erhalten). Per Umgebungsvariablen können Portainer/Compose-Pfade angepasst werden (siehe `docker-compose.yml`).
+Dieses Dashboard steuert und überwacht alle mandantenspezifischen Lagersoftware-Instanzen. Es ist als eigenständige Flask-Anwendung mit Application-Factory aufgebaut und nutzt SQLAlchemy/Flask-Migrate für das persistente Metadaten-Model.
 
 ## Hauptfunktionen
+- Kunden- und Instanzenverwaltung (CRUD light)
+- Stub-Steuerung für Start/Stop/Restart/Update über `docker_client.py`
+- Health- und Inventurabfragen gegen Mandanten-APIs via `instance_api.py`
+- Zentrale Stammdaten (`MasterArticle`) mit Push an Mandanten
 
-- Mandanten anlegen (Code, Name, API-Key, Endpoint-URL)
-- Deploy/Start einer Instanz via Docker Compose oder optional Portainer-API
-- Stoppen/Herunterfahren laufender Instanzen
-- Abruf der Health-Information einer Instanz über deren REST-API
+## Lokaler Start
+```bash
+cd admin_dashboard
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+export FLASK_APP=admin_dashboard.app:create_app
+export DASHBOARD_DATABASE_URI=sqlite:///data/dashboard.db
+export DASHBOARD_SECRET_KEY=dev-secret
+flask db upgrade  # ggf. vorher flask db init/migrate
+flask run --host 0.0.0.0 --port 8000
+```
 
-## Architektur
+## Docker
+```bash
+cd admin_dashboard
+docker compose up --build
+```
+Erreichbar unter `http://localhost:8100`. Die SQLite-DB wird unter `./data` persistiert.
 
-- **Application Factory** in `admin_dashboard/app.py`
-- **Modelle** in `admin_dashboard/models.py` (Tenant-Metadaten)
-- **Routes** in `admin_dashboard/routes/admin.py`
-- **Docker-Orchestrierung** über `docker_client.py`
-- **Tenant-API-Client** in `instance_api.py`
+## Wichtige Umgebungsvariablen
+- `DASHBOARD_DATABASE_URI`
+- `DASHBOARD_SECRET_KEY`
+- `INSTANCE_API_TIMEOUT`
 
-Das Dashboard selbst speichert keine Lagerdaten, sondern nur Mandanten- und Lifecycle-Informationen.
+## Architektur-Hinweise
+Details siehe `ARCHITECTURE.md`. Kernelemente:
+- `models.py`: Customer, Instance, MasterArticle, SyncLog
+- `docker_client.py`: Platzhalter für echte Docker/Portainer-Integration
+- `instance_api.py`: REST-Client für Mandanten-APIs (`/api/health`, `/api/inventory/summary`, `/api/articles/bulk_upsert`)
+- Blueprints unter `routes/admin.py` für UI-Views

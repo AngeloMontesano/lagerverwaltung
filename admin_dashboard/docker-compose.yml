@@ -1,14 +1,15 @@
-version: "3.9"
+version: "3.8"
+
 services:
-  admin:
+  admin_dashboard:
     build: .
+    container_name: admin_dashboard
+    restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "8100:8000"
     environment:
-      ADMIN_DATABASE_URL: sqlite:////app/data/admin.db
-      TENANT_TEMPLATE_PATH: /workspace/lagerverwaltung/lagersoftware
-      DEFAULT_API_KEY: ${DEFAULT_API_KEY:-demo-key}
+      FLASK_ENV: production
+      DASHBOARD_SECRET_KEY: "CHANGE_ME_SECRET"
+      DASHBOARD_DATABASE_URI: "sqlite:////app/data/dashboard.db"
     volumes:
-      - admin_data:/app/data
-volumes:
-  admin_data:
+      - ./data:/app/data

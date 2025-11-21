@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Dashboard</h2>
+<p>Mandant: {{ config.TENANT_ID if config else '' }}</p>
+<div class="cards">
+  <div class="card">Artikel: {{ stats.total_articles }}</div>
+  <div class="card">Bestand gesamt: {{ stats.total_stock }}</div>
+  <div class="card">Kritische Artikel: {{ stats.critical_articles }}</div>
+</div>
+<h3>Letzte Bestellungen</h3>
+<ul>
+  {% for order in orders %}
+    <li>{{ order.order_number }} ({{ order.status }})</li>
+  {% else %}
+    <li>Keine Bestellungen</li>
+  {% endfor %}
+</ul>
+{% endblock %}

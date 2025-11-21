@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Inventur</h2>
+<form method="post">
+  <label>Artikelnummer <input name="artikelnummer" required></label><br>
+  <label>Gezählte Menge <input type="number" name="counted_quantity" required></label><br>
+  <button type="submit">Buchen</button>
+</form>
+<table>
+  <tr><th>Artikel</th><th>Menge</th><th>Datum</th></tr>
+  {% for count in counts %}
+    <tr>
+      <td>{{ count.article.artikelnummer if count.article else '' }}</td>
+      <td>{{ count.counted_quantity }}</td>
+      <td>{{ count.counted_at.strftime('%Y-%m-%d %H:%M') if count.counted_at else '' }}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="3">Keine Inventurergebnisse</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

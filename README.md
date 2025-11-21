@@ -1,21 +1,15 @@
-# Lagerverwaltung – Multi-Tenant Plattform
+# Lagerverwaltung Platform
 
-Dieses Repository enthält zwei zusammengehörige Anwendungen:
+Dieses Repository enthält zwei voneinander getrennte Anwendungen:
 
-1. **`lagersoftware/`** – die eigentliche Lager- und Inventur-App, die pro Mandant als eigene Instanz betrieben wird (eigene DB, eigener API-Key).
-2. **`admin_dashboard/`** – ein Admin-Dashboard als Control Plane, das Mandanten verwaltet und Deployments/Health-Abfragen koordiniert.
+1. **Lagersoftware (pro Kunde)** unter `lagersoftware/`
+2. **Admin Dashboard (Control Plane)** unter `admin_dashboard/`
 
-Jede Mandanteninstanz wird über Docker Compose (oder optional Portainer) ausgerollt und besitzt eine eigene MariaDB-Datenbank. Alle konfigurierbaren Werte werden über Umgebungsvariablen gesteuert.
+Jede Kundeninstanz der Lagersoftware läuft als eigenes Flask/Python-Paket mit eigener Datenbank. Das Admin Dashboard verwaltet Kunden, Instanzen und Stammdaten und kann über die bereitgestellten REST-APIs Healthchecks und Synchronisationen auslösen.
 
-## Schnellstart
+## Schnelleinstieg
+- **Warehouse Instance**: siehe `lagersoftware/README.md` für Start, Konfiguration und REST-API.
+- **Admin Dashboard**: siehe `admin_dashboard/README.md` für Betrieb, Docker Compose und Datenmodell.
 
-- Mandanten-App lokal: `cd lagersoftware && CUSTOMER_CODE=demo API_KEY=geheim docker compose up -d --build`
-- Admin-Dashboard: `cd admin_dashboard && docker compose up -d --build`
-
-## Struktur
-
-- `lagersoftware/` – Flask-App mit Services, Routen und REST-API
-- `admin_dashboard/` – Flask-App zur Verwaltung von Mandanten und Deployments
-- `ARCHITECTURE.md` – detailierte Beschreibung der Module, APIs und Deployment-Strategie
-
-Alle Dokumentationstexte sind bewusst kurz gehalten und auf Deutsch, um den operativen Betrieb zu erleichtern.
+## Docker
+Beide Anwendungen bringen eigene `Dockerfile` und `docker-compose.yml`-Vorlagen mit, um sie unabhängig voneinander deployen zu können. Jede Warehouse-Instanz erhält eine eigene Datenbank (z. B. MariaDB) und wird über `TENANT_ID`/`API_AUTH_TOKEN` eindeutig identifizierbar.

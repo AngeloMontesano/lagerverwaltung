@@ -1,33 +1,44 @@
-"""HTTP-Client für Mandanten-APIs."""
+"""Client helpers for talking to warehouse instances."""
+from __future__ import annotations
+
+from typing import Any
+
 import requests
+from flask import current_app
+
+from .models import Instance
 
 
-class InstanceApiClient:
-    def __init__(self, base_url: str, api_key: str):
-        self.base_url = base_url.rstrip("/")
-        self.api_key = api_key
+class InstanceAPI:
+    def _headers(self, instance: Instance) -> dict[str, str]:
+        headers = {}
+        if instance.api_auth_token:
+            headers["X-API-TOKEN"] = instance.api_auth_token
+        return headers
 
-    def _headers(self) -> dict:
-        return {"X-API-Key": self.api_key}
+    def _timeout(self) -> int:
+        return current_app.config.get("INSTANCE_API_TIMEOUT", 5)
 
-    def health(self) -> dict:
-        resp = requests.get(f"{self.base_url}/api/health", headers=self._headers(), timeout=5)
-        resp.raise_for_status()
-        return resp.json()
+    def call_health(self, instance: Instance) -> dict[str, Any] | None:
+        url = f"{instance.api_base_url}/health" if instance.api_base_url else None
+        if not url:
+            return None
+        response = requests.get(url, headers=self._headers(instance), timeout=self._timeout())
+        response.raise_for_status()
+        return response.json()
 
-    def inventory_summary(self) -> dict:
-        resp = requests.get(
-            f"{self.base_url}/api/inventory/summary", headers=self._headers(), timeout=5
-        )
-        resp.raise_for_status()
-        return resp.json()
+    def call_inventory_summary(self, instance: Instance) -> dict[str, Any] | None:
+        url = f"{instance.api_base_url}/api/inventory/summary" if instance.api_base_url else None
+        if not url:
+            return None
+        response = requests.get(url, headers=self._headers(instance), timeout=self._timeout())
+        response.raise_for_status()
+        return response.json()
 
-    def sync_master(self, records: list[dict]) -> dict:
-        resp = requests.post(
-            f"{self.base_url}/api/sync/master",
-            headers=self._headers(),
-            json=records,
-            timeout=10,
-        )
-        resp.raise_for_status()
-        return resp.json()
+    def sync_articles(self, instance: Instance, articles: list[dict]) -> dict[str, Any] | None:
+        url = f"{instance.api_base_url}/api/articles/bulk_upsert" if instance.api_base_url else None
+        if not url:
+            return None
+        response = requests.post(url, json={"articles": articles}, headers=self._headers(instance), timeout=self._timeout())
+        response.raise_for_status()
+        return response.json()

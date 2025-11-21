@@ -1,46 +1,45 @@
-# Lagersoftware (Mandanten-Instanz)
+# Lagersoftware (Mandantenfähige Instanz)
 
-Dieses Paket stellt eine mandantenfähige Lagerverwaltung bereit, die pro Kunde als eigenständige Instanz (Container + Datenbank) betrieben wird. Eine Admin-Konsole orchestriert die Bereitstellung; diese README beschreibt den Betrieb einer einzelnen Instanz.
+Diese Anwendung ist eine neu strukturierte Warehouse-App pro Kunde. Sie nutzt Flask mit Application-Factory, Blueprints und einer Serviceschicht. Jede Instanz kann separat betrieben werden (z. B. per Docker Compose) und stellt zusätzlich eine gesicherte REST-API für das zentrale Admin-Dashboard bereit.
 
-## Start mit Docker Compose
+## Features
+- Artikel-, Bestands-, Bestell- und Inventur-Workflows (vereinfachte UI)
+- Service-Layer für wiederverwendbare Geschäftslogik
+- REST-API mit Token-Authentifizierung (`X-API-TOKEN`)
+- Logging mit Mandantenkennung
 
+## Starten (lokal)
 ```bash
 cd lagersoftware
-CUSTOMER_CODE=demo API_KEY=geheim docker compose up -d --build
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+export FLASK_APP=lagersoftware.app:create_app
+export DATABASE_URL=sqlite:///lagersoftware.db
+flask db upgrade  # falls Migrationen genutzt werden sollen
+flask run --host 0.0.0.0 --port 5000
 ```
-
-Wichtige Umgebungsvariablen:
-
-- `CUSTOMER_CODE`: eindeutiger Mandanten-Code, erscheint im Logging und in API-Responses.
-- `DATABASE_URL`: vollständige SQLAlchemy-URL (Standard zeigt auf den MariaDB-Service aus `docker-compose.yml`).
-- `API_KEY`: Schlüssel zur Absicherung der REST-API.
-- `APP_VERSION`: Version der Instanz, erscheint im Health-Endpunkt.
-- `LOG_LEVEL`: z. B. `INFO` oder `DEBUG`.
-
-Die Anwendung läuft per Standard auf Port `5000`; mit `APP_PORT` kann eine externe Portzuordnung gesetzt werden.
 
 ## REST-API
+- `GET /api/health` – Status, Version, Tenant
+- `GET /api/inventory/summary` – Artikelanzahl, Gesamtbestand, kritische Artikel
+- `POST /api/articles/bulk_upsert` – `{ "articles": [ {"artikelnummer": "A1", ...} ] }`
+- `POST /api/heartbeat` – Heartbeat-Endpoint für spätere Telefon-Home-Szenarien
 
-| Methode | Pfad | Beschreibung | Auth |
-| --- | --- | --- | --- |
-| GET | `/api/health` | Status, Mandant und Version der Instanz | `X-API-Key`
-| GET | `/api/inventory/summary` | Anzahl Artikel und Gesamtmenge | `X-API-Key`
-| POST | `/api/articles/bulk_upsert` | Artikel-Liste (JSON) anlegen/aktualisieren | `X-API-Key`
-| POST | `/api/sync/master` | Platzhalter für Stammdaten-Sync | `X-API-Key`
+Alle API-Calls müssen den Header `X-API-TOKEN` mit dem Wert aus `API_AUTH_TOKEN` schicken.
 
-Beispielaufruf:
-
+## Docker Compose (Einzelinstanz)
+Siehe `docker-compose.yml` als Vorlage. Beispielstart:
 ```bash
-curl -H "X-API-Key: geheim" http://localhost:5000/api/health
+cd lagersoftware
+docker compose up --build
 ```
 
-## Architektur
-
-- **Application Factory** in `lagersoftware/app.py` (für Gunicorn nutzbar)
-- **Config** in `lagersoftware/config.py` liest Umgebungsvariablen
-- **Modelle** in `lagersoftware/models.py` (SQLAlchemy)
-- **Services** kapseln Geschäftslogik (`services/*.py`)
-- **Routes** trennen Web-UI und API (`routes/*.py`)
-- **Logging** ergänzt tenant-Kontext über einen Filter
-
-Die Datenbanktabellen werden beim Start automatisch angelegt; für produktive Umgebungen kann `flask db`/Migrations genutzt werden.
+## Konfiguration
+Wichtige Umgebungsvariablen:
+- `DATABASE_URL` – SQLAlchemy-Connection-String
+- `TENANT_ID` – Mandantenkennung
+- `API_AUTH_TOKEN` – Token für gesicherte REST-API
+- `SECRET_KEY` – Flask Secret
+- `APP_VERSION` – Versionskennung
+- `ENVIRONMENT` – z. B. dev/test/prod
