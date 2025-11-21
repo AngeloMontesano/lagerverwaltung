@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <div>
+            <h2>{{ instance.customer.name }} – {{ instance.technical_name }}</h2>
+            <p>Umgebung: {{ instance.environment }} · Version: {{ instance.version }}</p>
+        </div>
+    </div>
+    <div class="card-body">
+        <dl class="meta">
+            <div><dt>Status</dt><dd class="status {{ instance.status }}">{{ instance.status }}</dd></div>
+            <div><dt>Base URL</dt><dd><a href="{{ instance.base_url }}" target="_blank">{{ instance.base_url }}</a></dd></div>
+            <div><dt>DB URL</dt><dd><code>{{ instance.db_url }}</code></dd></div>
+            <div><dt>Letztes Deployment</dt><dd>{{ instance.last_deploy_at or '–' }}</dd></div>
+            <div><dt>Angelegt</dt><dd>{{ instance.created_at }}</dd></div>
+        </dl>
+        <form method="post" class="actions">
+            <button class="btn" name="action" value="start" type="submit">Start</button>
+            <button class="btn" name="action" value="stop" type="submit">Stop</button>
+            <button class="btn" name="action" value="restart" type="submit">Restart</button>
+            <div class="update-group">
+                <label for="version">Update-Version</label>
+                <input id="version" name="version" type="text" value="{{ instance.version }}">
+                <button class="btn" name="action" value="update" type="submit">Update ausführen</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3>Datenbank & KPIs</h3>
+    </div>
+    <div class="card-body">
+        <p>DB-Verbindung: <strong class="status {{ 'running' if db_ok else 'stopped' }}">{{ 'OK' if db_ok else 'Fehler' }}</strong></p>
+        {% if db_ok and stats %}
+            <ul class="kpi-list">
+                <li><span class="kpi-value">{{ stats.article_count }}</span><span class="kpi-label">Artikel</span></li>
+                <li><span class="kpi-value">{{ stats.total_stock }}</span><span class="kpi-label">Gesamtbestand</span></li>
+                <li><span class="kpi-value">{{ stats.critical_articles }}</span><span class="kpi-label">Kritische Artikel</span></li>
+            </ul>
+        {% else %}
+            <p>Keine Statistiken verfügbar. Prüfe die Verbindungseinstellungen der Instanz.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

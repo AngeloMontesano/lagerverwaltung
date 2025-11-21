@@ -1,0 +1,12 @@
+version: '3.9'
+services:
+  admin_dashboard:
+    build: .
+    ports:
+      - "8100:8000"
+    environment:
+      - DASHBOARD_DATABASE_URI=sqlite:////app/data/dashboard.db
+    volumes:
+      - ./data:/app/data
+    # Für spätere Docker-Integration könnte das Socket eingebunden werden:
+    # - /var/run/docker.sock:/var/run/docker.sock

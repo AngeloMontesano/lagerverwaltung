@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Übersicht Kunden & Instanzen</h2>
+{% if customers %}
+    {% for customer in customers %}
+        <section class="card">
+            <div class="card-header">
+                <div>
+                    <h3>{{ customer.name }}</h3>
+                    <p>Kundennummer: {{ customer.customer_number }}{% if customer.plan %} · Tarif: {{ customer.plan }}{% endif %}</p>
+                </div>
+            </div>
+            {% if customer.instances %}
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Instanz</th>
+                        <th>Umgebung</th>
+                        <th>Version</th>
+                        <th>Status</th>
+                        <th>Letztes Deployment</th>
+                        <th>URL</th>
+                        <th>Aktionen</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for instance in customer.instances %}
+                        <tr>
+                            <td>{{ instance.technical_name }}</td>
+                            <td>{{ instance.environment }}</td>
+                            <td>{{ instance.version }}</td>
+                            <td class="status {{ instance.status }}">{{ instance.status }}</td>
+                            <td>{{ instance.last_deploy_at or '–' }}</td>
+                            <td><a href="{{ instance.base_url }}" target="_blank">Öffnen</a></td>
+                            <td><a class="btn" href="{{ url_for('admin.instance_detail', instance_id=instance.id) }}">Details</a></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Keine Instanzen hinterlegt.</p>
+            {% endif %}
+        </section>
+    {% endfor %}
+{% else %}
+    <p>Noch keine Kunden angelegt.</p>
+{% endif %}
+{% endblock %}
