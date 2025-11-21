@@ -9,7 +9,7 @@ cd admin_dashboard
 docker compose up -d --build
 ```
 
-Standardmäßig nutzt die App eine SQLite-Datenbank im Volume `admin_data`. Per Umgebungsvariablen können Portainer/Compose-Pfade angepasst werden (siehe `docker-compose.yml`).
+Standardmäßig nutzt die App eine SQLite-Datenbank im Volume `admin_data`. Beim Start legt `create_app()` alle Tabellen automatisch an (Tabellenname `customers` bleibt aus Abwärtskompatibilität erhalten). Per Umgebungsvariablen können Portainer/Compose-Pfade angepasst werden (siehe `docker-compose.yml`).
 
 ## Hauptfunktionen
 

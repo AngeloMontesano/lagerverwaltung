@@ -7,7 +7,10 @@ db = SQLAlchemy()
 
 
 class Tenant(db.Model):
-    __tablename__ = "tenants"
+    # Für Abwärtskompatibilität heißt die Tabelle weiterhin "customers",
+    # damit bestehende SQLite-Dateien aus früheren Experimenten automatisch
+    # gefunden und mit db.create_all() angelegt werden.
+    __tablename__ = "customers"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
