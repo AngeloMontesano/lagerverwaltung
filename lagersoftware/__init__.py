@@ -1,4 +1,3 @@
-"""Admin-Dashboard Paket."""
+"""Lagersoftware Paketinitialisierung."""
 from .app import create_app
-
 __all__ = ["create_app"]

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row mb-4">
+  <div class="col">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Bestandsübersicht</h5>
+        <p class="card-text mb-0">Artikel: {{ summary.artikel }}</p>
+        <p class="card-text">Gesamtmenge: {{ summary.gesamtmenge }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <h5>Letzte Zählungen</h5>
+    <table class="table table-striped">
+      <thead><tr><th>Artikel</th><th>Menge</th><th>Gezählt am</th></tr></thead>
+      <tbody>
+        {% for count in counts %}
+        <tr>
+          <td>{{ count.article.sku }} – {{ count.article.name }}</td>
+          <td>{{ count.counted_quantity }}</td>
+          <td>{{ count.counted_at.strftime('%d.%m.%Y %H:%M') }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3">Keine Zählungen vorhanden.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
