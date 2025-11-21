@@ -2,10 +2,14 @@ version: '3.9'
 services:
   admin_dashboard:
     build: .
+    container_name: admin_dashboard
+    restart: unless-stopped
     ports:
       - "8100:8000"
     environment:
-      - DASHBOARD_DATABASE_URI=sqlite:////app/data/dashboard.db
+      FLASK_ENV: production
+      DASHBOARD_SECRET_KEY: "bitte-durch-einen-starken-key-ersetzen"
+      DASHBOARD_DATABASE_URI: "sqlite:////app/data/dashboard.db"
     volumes:
       - ./data:/app/data
     # Für spätere Docker-Integration könnte das Socket eingebunden werden:

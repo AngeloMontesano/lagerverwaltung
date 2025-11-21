@@ -10,6 +10,8 @@ db = SQLAlchemy()
 
 
 class Customer(db.Model):
+    """Represents a tenant/customer of the warehouse solution."""
+
     __tablename__ = "customers"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -27,6 +29,8 @@ class Customer(db.Model):
 
 
 class Instance(db.Model):
+    """Represents a deployable instance that belongs to a customer."""
+
     __tablename__ = "instances"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -47,6 +51,7 @@ class Instance(db.Model):
 
     def mark_status(self, status: str) -> None:
         """Update the instance status with a timestamp."""
+
         self.status = status
         self.last_deploy_at = datetime.utcnow()
 
