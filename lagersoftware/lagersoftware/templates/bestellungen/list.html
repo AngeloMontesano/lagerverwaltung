@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Bestellungen</h2>
+<a href="{{ url_for('bestellungen.create_view') }}">Neue Bestellung</a>
+<ul>
+  {% for order in orders %}
+    <li>{{ order.order_number }} - {{ order.status }} ({{ order.created_at.strftime('%Y-%m-%d') if order.created_at else '' }})</li>
+  {% else %}
+    <li>Keine Bestellungen vorhanden</li>
+  {% endfor %}
+</ul>
+{% endblock %}

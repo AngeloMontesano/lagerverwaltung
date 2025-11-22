@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Bestand anpassen</h2>
+<form method="post">
+  <label>Artikel
+    <select name="article_id">
+      {% for article in articles %}
+        <option value="{{ article.id }}">{{ article.artikelnummer }} - {{ article.name }}</option>
+      {% endfor %}
+    </select>
+  </label><br>
+  <label>Menge <input type="number" name="quantity" required></label><br>
+  <label>Typ <input name="movement_type" value="manual"></label><br>
+  <button type="submit">Speichern</button>
+</form>
+{% endblock %}

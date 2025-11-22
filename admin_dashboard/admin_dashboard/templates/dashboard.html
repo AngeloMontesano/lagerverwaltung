@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Kunden & Instanzen</h2>
+<form method="post" action="{{ url_for('admin.create_customer') }}">
+  <fieldset>
+    <legend>Neuen Kunden anlegen</legend>
+    <input name="name" placeholder="Name" required>
+    <input name="customer_number" placeholder="Kundennummer" required>
+    <input name="contact_email" placeholder="E-Mail">
+    <select name="hosting_mode"><option value="central">Central</option><option value="on_prem">On-Prem</option></select>
+    <input name="plan" placeholder="Plan" value="basic">
+    <button type="submit">Speichern</button>
+  </fieldset>
+</form>
+{% for customer in customers %}
+  <section class="card">
+    <h3><a href="{{ url_for('admin.customer_detail', customer_id=customer.id) }}">{{ customer.name }}</a></h3>
+    <p>{{ customer.customer_number }} – {{ customer.plan }} – {{ customer.hosting_mode }}</p>
+    <ul>
+      {% for instance in customer.instances %}
+        <li>
+          <strong>{{ instance.environment }}</strong> – {{ instance.version }} – Status: {{ instance.status }}
+          <a href="{{ url_for('admin.instance_detail', instance_id=instance.id) }}">Details</a>
+        </li>
+      {% else %}
+        <li>Keine Instanzen</li>
+      {% endfor %}
+    </ul>
+  </section>
+{% else %}
+  <p>Noch keine Kunden erfasst.</p>
+{% endfor %}
+{% endblock %}

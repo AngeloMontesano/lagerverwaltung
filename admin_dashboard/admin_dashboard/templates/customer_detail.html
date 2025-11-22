@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>{{ customer.name }} ({{ customer.customer_number }})</h2>
+<p>Plan: {{ customer.plan }} | Hosting: {{ customer.hosting_mode }} | Kontakt: {{ customer.contact_email }}</p>
+<h3>Instanzen</h3>
+<ul>
+  {% for instance in customer.instances %}
+    <li><a href="{{ url_for('admin.instance_detail', instance_id=instance.id) }}">{{ instance.environment }}</a> – {{ instance.status }}</li>
+  {% else %}
+    <li>Keine Instanzen</li>
+  {% endfor %}
+</ul>
+<form method="post" action="{{ url_for('admin.create_instance') }}">
+  <fieldset>
+    <legend>Neue Instanz erstellen</legend>
+    <input type="hidden" name="customer_id" value="{{ customer.id }}">
+    <input name="environment" placeholder="Environment" value="prod">
+    <input name="version" placeholder="Version" value="0.1.0">
+    <input name="technical_name" placeholder="Technischer Name">
+    <input name="base_url" placeholder="Base URL">
+    <input name="api_base_url" placeholder="API Base URL">
+    <input name="api_auth_token" placeholder="API Token">
+    <select name="hosting_mode"><option value="central">Central</option><option value="on_prem">On-Prem</option></select>
+    <button type="submit">Anlegen</button>
+  </fieldset>
+</form>
+{% endblock %}

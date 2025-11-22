@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <title>Lagersoftware</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  </head>
+  <body>
+    <header>
+      <h1>Lagersoftware</h1>
+      <nav>
+        <a href="{{ url_for('dashboard.index') }}">Dashboard</a>
+        <a href="{{ url_for('artikel.list_view') }}">Artikel</a>
+        <a href="{{ url_for('bestellungen.list_view') }}">Bestellungen</a>
+        <a href="{{ url_for('bestandsverwaltung.adjust') }}">Bestand</a>
+        <a href="{{ url_for('inventur.manage') }}">Inventur</a>
+        <a href="{{ url_for('berichte.inventory_report') }}">Berichte</a>
+        <a href="{{ url_for('einstellungen.view') }}">Einstellungen</a>
+      </nav>
+    </header>
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>

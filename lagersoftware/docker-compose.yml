@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  db:
+    image: mariadb:11
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: lagerdb
+      MYSQL_USER: lageruser
+      MYSQL_PASSWORD: lagerpass
+    volumes:
+      - ./data/db:/var/lib/mysql
+    restart: unless-stopped
+
+  app:
+    build: .
+    environment:
+      DATABASE_URL: "mysql+pymysql://lageruser:lagerpass@db:3306/lagerdb"
+      TENANT_ID: "CUST-XXXX"
+      API_AUTH_TOKEN: "CHANGE_ME_STRONG"
+      SECRET_KEY: "CHANGE_ME_SECRET"
+      APP_VERSION: "1.0.0"
+      ENVIRONMENT: "prod"
+    ports:
+      - "5001:5000"
+    depends_on:
+      - db
+    restart: unless-stopped

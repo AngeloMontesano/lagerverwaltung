@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  admin_dashboard:
+    build: .
+    container_name: admin_dashboard
+    restart: unless-stopped
+    ports:
+      - "8100:8000"
+    environment:
+      FLASK_ENV: production
+      DASHBOARD_SECRET_KEY: "CHANGE_ME_SECRET"
+      DASHBOARD_DATABASE_URI: "sqlite:////app/data/dashboard.db"
+    volumes:
+      - ./data:/app/data
