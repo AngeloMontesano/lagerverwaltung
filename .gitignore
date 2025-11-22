@@ -9,3 +9,7 @@ __pycache__/
 venv/
 ENV/
 .env
+
+# Laufzeitdaten
+admin_dashboard/data/
+**/data/*.db
